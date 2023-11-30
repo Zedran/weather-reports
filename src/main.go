@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Zedran/weather-reports/src/metar"
+	"github.com/Zedran/metar"
 )
 
 const (
