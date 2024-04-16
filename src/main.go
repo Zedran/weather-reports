@@ -19,24 +19,29 @@ const (
 	OUT_DELIM  = "\n\n---------------------------------------\n\n"
 
 	// Output format, mirrors the website's way of displaying reports
-	OUT_FORMAT = "%s\n\n%s"
+	OUT_FORMAT = "%s%s\n\n%s"
 )
 
 /* Returns the string containing the formatted report. */
 func FindingToString(f *metar.Finding, taf bool) string {
-	if len(f.METAR) == 0 {
-		f.METAR = fmt.Sprintf(NF_PHRASE, "METAR", f.Code)
-	}
+    var badSensor string
+	
+    if len(f.METAR) == 0 {
+    	f.METAR = fmt.Sprintf(NF_PHRASE, "METAR", f.Code)
+	} else if !f.OK {
+        f.METAR = f.METAR[:len(f.METAR) - 2]
+        badSensor = fmt.Sprintf("\n\nSensor at %s requires maintenance. Some data may be inaccurate.", f.Code)
+    }
 
 	if !taf {
-		return f.METAR
+		return fmt.Sprintf("%s%s", f.METAR, badSensor)
 	}
 
 	if len(f.TAF) == 0 {
 		f.TAF = fmt.Sprintf(NF_PHRASE, "TAF", f.Code)
 	}
 
-	return fmt.Sprintf(OUT_FORMAT, f.METAR, f.TAF)
+	return fmt.Sprintf(OUT_FORMAT, f.METAR, badSensor, f.TAF)
 }
 
 /* Calls FindingToString for every Finding. */
